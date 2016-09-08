@@ -2,12 +2,14 @@
 import java.util.Scanner;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 
-class lab1 {
+class HMM2 {
 
 	static double[][] matrixA;
 	static double[][] matrixB;
 	static double[][] matrixInit;
+	static double[][] emissionSeq;
 
 	public static void getInput() throws IOException{
 		Scanner stdin = new Scanner(System.in);
@@ -43,7 +45,14 @@ class lab1 {
 				matrixInit[i][j] = stdin.nextDouble();
 			}
 		}
-		/*
+
+		int eSeq = stdin.nextInt();
+		emissionSeq = new double[eSeq][1];
+		for(int i = 0; i < eSeq; i++){
+			emissionSeq[i][1] = stdin.nextInt();
+		}
+
+		
 		//print Matrix A
 		System.out.println("Matrix A");
 		for(int i = 0; i < ax; i++){
@@ -70,7 +79,13 @@ class lab1 {
 			}
 			System.out.println();
 
-		}*/
+		}
+
+		//print Emission Sequence
+		System.out.println("Emission Sequence");
+		for(int i = 0; i < ix; i++){
+				System.out.print(emissionSeq[i][0] + "		" );
+		}
 	}
 
 	public static double[][] multiplyByMatrix(double[][] m1, double[][] m2) {
@@ -100,18 +115,16 @@ class lab1 {
 	}
 
     public static void main(String[] args) throws IOException {
-    	getInput();
-
-    	double[][] res = emission();
-
-    	String out = res.length + " " + res[0].length + " ";
-
-    	for(int i = 0; i < res.length; i++){
-    		for(int j = 0; j < res[0].length; j++){
-    			out += (res[i][j]) + " ";
+    	getInput();    
+    	double[][] out = new double[1][matrixB.length];
+    	double[][] maB2 = new double[1][matrixB.length];
+    	for(int i = 0; i < emissionSeq.length; i++){
+    		for(int j = 0; j < matrixB.length; j++){
+    			int tmp = (int)emissionSeq[j][0];
+    			maB2[0][j] = matrixB[tmp][j];
     		}
+    		out = multiplyByMatrix(matrixInit,maB2);
     	}
 
-    	System.out.println(out.trim());
     }
 }
