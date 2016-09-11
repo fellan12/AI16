@@ -1,4 +1,5 @@
 import java.util.Scanner;
+import java.util.Arrays;
 
 public class HMM3 {
 
@@ -7,6 +8,7 @@ public class HMM3 {
 	static double[][] emissionMatrix;
 	static double[][] initState;
 	static double[][] delta;
+	static int[][] argmax;
 
 	static int[] obsSequence;
 	static int numOfObs;
@@ -43,42 +45,58 @@ public class HMM3 {
 		// number of states
 		n = trow;
 
-		double[][] alpha = alphaPass();
-		//Matrix.printMatrix(alpha);
+		double[][] delta = deltaPass();
+		//Matrix.printMatrix(delta);
+		//Matrix.printMatrix(argmax);
 
-		double sum = 0;
+	
 
-		for (int r = 0; r < alpha.length; r++) {
-			sum += alpha[r][alpha[0].length-1];
+		// kolla största värdet i deltas sista kolumn
+		double maxLast = 0;
+		int idxLast = 0;
+		for (int r = 0; r < delta.length; r++) {
+			if (delta[r][delta[0].length-1] > maxLast) {
+				maxLast = delta[r][delta[0].length-1];
+				idxLast = r;
+			}
 		}
-		System.out.println(sum);
+
+		String ans = idxLast + " ";
+		
+		for (int obs = numOfObs-1; obs > 0; obs--) {
+			
+			ans = ans + argmax[idxLast][obs] + " ";
+			idxLast = argmax[idxLast][obs];
+		}
+
+		//reverse the sequence so that it is correct in aspect of time
+		String ans1 = new StringBuilder(ans).reverse().toString();
+
+		System.out.println(ans1.substring(1));
+
 	}
 
 
 	public static double[][] deltaPass() {
-		// initialize alpha-matrix
-		alpha = new double[n][numOfObs];
+		// initialize delta-matrix
+		delta = new double[n][numOfObs];
+		argmax = new int[n][numOfObs];
 
-		// compute alpha-0(i)
+		// compute delta-0(i)
 		print("beräkna delta-0");
 		double c0 = 0;
 		for (int i = 0; i < n; i++) {
 			delta[i][0] = initState[0][i]*emissionMatrix[i][obsSequence[0]];
-			c0 += alpha[i][0];
+			c0 += delta[i][0];
 			print("delta"+i+0+": " + delta[i][0] );
 		}
 
-		// // scale alpha-0(i)
-		// c0 = 1/c0;
-		// for (int i = 0; i < n; i++) {
-		// 	alpha[i][0] *= c0;
-		// }
 
 
-		// compute alpha-t(i)
+		// compute delta-t(i)
 		for (int t = 1; t < numOfObs; t++) {
 			print("t= " + t);
-			//double ct = 0;
+	
 			for (int i = 0; i < n; i++) {
 				print("i= " + i);
 				print("obs ");
@@ -88,38 +106,36 @@ public class HMM3 {
 					tmp[j] = delta[j][t-1]*transMatrix[j][i]*emissionMatrix[i][obsSequence[t]];
 				}
 				// hitta max av tmp
-				delta[i][t] = findMax(tmp);
-				// spara det i delta[i][t]
 
+				delta[i][t] = findMax(tmp)[0];
+				// spara argmax
+				argmax[i][t] = (int) findMax(tmp)[1];
 
-				//ct += alpha[i][t];
+			
 			}
 
-			// // scale alpha-t(i)
-			// ct = 1/ct;
-			// for (int i = 0; i < n; i++) {
-			// 	alpha[i][t] *= ct;
-			// }
 		}
 
-		return alpha;
+		return delta;
 
 
 
 
 	}
 
-	public static void print (String tmp) {
+	public static void print(String tmp) {
 		if (prt) {
 			System.out.println(tmp);
 		}
 	}
 
-	public static double findMax(double[] arr) {
-		double maxVal = arr[0];
+	public static double[] findMax(double[] arr) {
+		double[] maxVal = new double[2];
+
 		for (int i = 0; i < arr.length; i++) {
-			if (arr[i] > maxval) {
-				maxVal = arr[i];
+			if (arr[i] > maxVal[0]) {
+				maxVal[0] = arr[i];
+				maxVal[1] = i;
 			}
 		}
 		return maxVal;
