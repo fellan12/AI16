@@ -32,10 +32,4 @@ public class HMM1 {
 		System.out.print(nextObs.length + " " + nextObs[0].length + " ");
 		Matrix.printMatrix(nextObs);
 	}
-
-
-
-
-
-
 }

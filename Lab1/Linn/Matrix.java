@@ -2,8 +2,6 @@ import java.util.Scanner;
 
 public class Matrix {
 
-
-
 	public static double[][] multiMatrix(double[][] matA, double[][] matB) {
 
 		double[][] res = new double[matA.length][matB[0].length];
@@ -23,6 +21,8 @@ public class Matrix {
 		double[][] matrix = new double[row][col];
 
 		for (int r = 0; r < row; r++) {
+			
+	
 			for (int c = 0; c < col; c++) {
 				matrix[r][c] = Double.parseDouble(in.next());
 			}
@@ -39,5 +39,6 @@ public class Matrix {
 			System.out.println("");
 		}
 	}
+
 }
 	
