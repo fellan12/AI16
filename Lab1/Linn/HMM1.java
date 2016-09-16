@@ -26,9 +26,11 @@ public class HMM1 {
 		int iscol = in.nextInt();
 		initState = Matrix.createMatrix(isrow, iscol, in);
 
+		// Calculate P(Ot+1) = A*pi*B
 		double[][] nextState = Matrix.multiMatrix(initState, transMatrix);
 		double[][] nextObs = Matrix.multiMatrix(nextState, emissionMatrix);
 
+		// Print result
 		System.out.print(nextObs.length + " " + nextObs[0].length + " ");
 		Matrix.printMatrix(nextObs);
 	}

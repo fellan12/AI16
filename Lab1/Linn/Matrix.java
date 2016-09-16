@@ -34,7 +34,7 @@ public class Matrix {
 
 		for (int i = 0; i < mtx.length; i++) {
 			for (int j = 0; j < mtx[0].length; j++) {
-				System.out.print(mtx[i][j] + " ");
+				System.out.print(String.format("%.2g%n", mtx[i][j]).replace("\n","") + " ");
 			}
 			System.out.println("");
 		}
