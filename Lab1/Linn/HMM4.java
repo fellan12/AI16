@@ -2,8 +2,6 @@ import java.util.Scanner;
 
 public class HMM4 {
 
-
-
 	static Scanner in = new Scanner(System.in);
 	static double[][] transMatrix;
 	static double[][] emissionMatrix;
@@ -19,7 +17,7 @@ public class HMM4 {
 	static int ecol;
 	static int numOfStates; // number of states
 
-	static int maxIters = 10000;
+	static int maxIters = 1000;
 	static int iters = 0;
 	static double oldLogProb = Double.NEGATIVE_INFINITY;
 	static double logProb;
@@ -60,9 +58,16 @@ public class HMM4 {
 		reestimateModel();
 		calcLogProb();
 
+		//Matrix.printMatrix(alpha);
+		//Matrix.printMatrix(beta);
+
+		//System.out.println("oldlog; " + oldLogProb);
+		//System.out.println("log: " + logProb);
+
 		while (iters < maxIters && logProb > oldLogProb) {
 
 			oldLogProb = logProb;
+			//System.out.println("oldLogProb: " + oldLogProb);
 			alphaPass();
 			betaPass();
 			gamma();
@@ -165,7 +170,7 @@ public class HMM4 {
 		
 		double denom = 0;
 
-		for (int t = 0; t < numOfObs-2; t++) {
+		for (int t = 0; t < numOfObs-1; t++) {
 
 			// calculate denominator
 			denom = 0;
@@ -238,6 +243,7 @@ public class HMM4 {
 		logProb = 0;
 		for (int i = 0; i < numOfObs; i++) {
 			logProb += Math.log(c[i]);
+
 		}
 		logProb = -logProb;
 	}
