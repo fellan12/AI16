@@ -24,7 +24,7 @@ public class Player {
         int res = -Integer.MAX_VALUE;   //Going to be the value for the best move
 
         for(GameState state : nextStates){
-            tmp = alphabeta(state, 100, "A", deadline);    //Run alpha-beta on a state
+            tmp = alphabeta(state, 20, "A", deadline);    //Run alpha-beta on a state
             if(res < tmp){      //If the value is better then det prevous
                 res = tmp;      //Save the value
                 next = state;   //Save the state
