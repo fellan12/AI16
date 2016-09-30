@@ -29,7 +29,6 @@ public class HMM4 {
 		int trow = in.nextInt();
 		int tcol = in.nextInt();
 		transMatrix = Matrix.createMatrix(trow, tcol, in);
-		// Matrix.printMatrix(transMatrix);
 
 		// Create emission matrix start guess
 		int erow = in.nextInt();
@@ -80,6 +79,8 @@ public class HMM4 {
 			iters++;
 		}
 
+
+
 		//System.out.println("iters: " + iters);
 		// for (int i = 0; i < 10000; i++) {
 		// 	alphaPass();
@@ -98,7 +99,15 @@ public class HMM4 {
 		System.out.print(erow + " " + ecol + " ");
 		Matrix.printMatrix(emissionMatrix);
 		
-
+		for (int t = 0; t < numOfObs; t ++) {
+			for (int i = 0; i < numOfStates; i++) {
+				for (int j = 0; j < numOfStates; j++) {
+					System.out.print(digamma[i][j][t] + " ");
+				}
+				System.out.println("");
+			}
+			System.out.println("");
+		}
 
 	}
 
