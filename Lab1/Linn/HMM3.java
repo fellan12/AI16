@@ -8,7 +8,7 @@ public class HMM3 {
 	static double[][] emissionMatrix;
 	static double[][] initState;
 	static double[][] delta;
-	static int[][] argmax;
+	static int[][] deltaidx;
 
 	static int[] obsSequence;
 	static int numOfObs;
@@ -21,19 +21,16 @@ public class HMM3 {
 		int trow = in.nextInt();
 		int tcol = in.nextInt();
 		transMatrix = Matrix.createMatrix(trow, tcol, in);
-		//Matrix.printMatrix(transMatrix);
 
 		// Create emission matrix
 		int erow = in.nextInt();
 		int ecol = in.nextInt();
 		emissionMatrix = Matrix.createMatrix(erow, ecol, in);
-		//Matrix.printMatrix(emissionMatrix);
 
 		// Create initial state probability matrix
 		int isrow = in.nextInt();
 		int iscol = in.nextInt();
 		initState = Matrix.createMatrix(isrow, iscol, in);
-		//Matrix.printMatrix(initState);
 
 		// Create observation sequence array
 		numOfObs = in.nextInt();
@@ -45,13 +42,9 @@ public class HMM3 {
 		// number of states
 		n = trow;
 
-		double[][] delta = deltaPass();
-		//Matrix.printMatrix(delta);
-		//Matrix.printMatrix(argmax);
+		double[][] delta = deltaPass();	
 
-	
-
-		// kolla största värdet i deltas sista kolumn
+		// Look at the biggest value in deltas column, to get the last state in the sequence
 		double maxLast = 0;
 		int idxLast = 0;
 		for (int r = 0; r < delta.length; r++) {
@@ -65,68 +58,40 @@ public class HMM3 {
 		
 		for (int obs = numOfObs-1; obs > 0; obs--) {
 			
-			ans = ans + argmax[idxLast][obs] + " ";
-			idxLast = argmax[idxLast][obs];
+			ans = ans + deltaidx[idxLast][obs] + " ";
+			idxLast = deltaidx[idxLast][obs];
 		}
 
 		//reverse the sequence so that it is correct in aspect of time
 		String ans1 = new StringBuilder(ans).reverse().toString();
-
 		System.out.println(ans1.substring(1));
-
 	}
-
 
 	public static double[][] deltaPass() {
 		// initialize delta-matrix
 		delta = new double[n][numOfObs];
-		argmax = new int[n][numOfObs];
+		deltaidx = new int[n][numOfObs];
 
 		// compute delta-0(i)
-		print("beräkna delta-0");
-		double c0 = 0;
 		for (int i = 0; i < n; i++) {
 			delta[i][0] = initState[0][i]*emissionMatrix[i][obsSequence[0]];
-			c0 += delta[i][0];
-			print("delta"+i+0+": " + delta[i][0] );
 		}
-
-
 
 		// compute delta-t(i)
 		for (int t = 1; t < numOfObs; t++) {
-			print("t= " + t);
-	
 			for (int i = 0; i < n; i++) {
-				print("i= " + i);
-				print("obs ");
 				delta[i][t] = 0;
-				double[] tmp = new double[transMatrix.length];
+				double[] tmp = new double[transMatrix.length]; // the prob. of having observed O(1:t), being in state i given j as most likely state before
 				for (int j = 0; j < n; j++) {
 					tmp[j] = delta[j][t-1]*transMatrix[j][i]*emissionMatrix[i][obsSequence[t]];
 				}
-				// hitta max av tmp
-
+				// we choose the maximum number in tmp for delta, that is, that element whose preceding state (j) gives the highest probability
 				delta[i][t] = findMax(tmp)[0];
-				// spara argmax
-				argmax[i][t] = (int) findMax(tmp)[1];
-
-			
+				// saving the index for the idx-matrix
+				deltaidx[i][t] = (int) findMax(tmp)[1];
 			}
-
 		}
-
 		return delta;
-
-
-
-
-	}
-
-	public static void print(String tmp) {
-		if (prt) {
-			System.out.println(tmp);
-		}
 	}
 
 	public static double[] findMax(double[] arr) {
@@ -140,7 +105,4 @@ public class HMM3 {
 		}
 		return maxVal;
 	}
-
-	
-
 }
