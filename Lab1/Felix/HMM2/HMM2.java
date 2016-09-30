@@ -176,6 +176,7 @@ class HMM2 {
     	double[][] alphaA = null;
     	double[][] maB = null;
     	//printMatrix(getB((int)emissionSeq[0][0]));
+    	
     	alpha = scalarByMatrix(matrixInit, getB((int)emissionSeq[0][0]));	//Alpha 1
     	//printMatrix(alpha);
 
