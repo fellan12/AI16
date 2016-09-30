@@ -24,7 +24,7 @@ public class Player {
         int res = -Integer.MAX_VALUE;   //Going to be the value for the best move
 
         for(GameState state : nextStates){
-            tmp = alphabeta(state, 20, "A");    //Run alpha-beta on a state
+            tmp = alphabeta(state, 100, "A", deadline);    //Run alpha-beta on a state
             if(res < tmp){      //If the value is better then det prevous
                 res = tmp;      //Save the value
                 next = state;   //Save the state
@@ -34,7 +34,7 @@ public class Player {
         return next;            //Return the state
     }
 
-    public static int alphabeta(GameState currState, int depth, String player){
+    public static int alphabeta(GameState currState, int depth, String player, final Deadline deadline){
         //state: the current state we are analyzing
         //alpha: the current best value achievable by A
         //beta: the current best value acheivable by B
@@ -44,32 +44,35 @@ public class Player {
         int alpha = -Integer.MAX_VALUE;
         int beta = Integer.MAX_VALUE;
         Vector<GameState> nextStates = new Vector<GameState>();
-        currState.findPossibleMoves(nextStates);
-
-
-        if (depth == 0 || nextStates == null){
-            //terminalstate
-            v = utility_function(currState);
-
-        }else if (player == "A"){
-            v = -Integer.MAX_VALUE;
-            for(GameState child : nextStates)
-            v = Math.max(v, alphabeta(child, depth-1, "B"));
-            alpha = Math.max(alpha,v);
-            if(beta <= alpha){
-                return v; //betaprune
-            }
-
-        }else{//player=B
-            v= Integer.MAX_VALUE;
-            for(GameState child : nextStates){
-                v=Math.min(v,alphabeta(child,depth-1, "A"));
-                beta = Math.min(beta,v);
-            }
-            if (beta <= alpha){
-                return v;
-            }
-        }//alphaprune
+        while(deadline.timeUntil() - deadline.getCpuTime() > 20000000){
+                
+                currState.findPossibleMoves(nextStates);
+        
+        
+                if (depth == 0 || nextStates == null){
+                    //terminalstate
+                    v = utility_function(currState);
+        
+                }else if (player == "A"){
+                    v = -Integer.MAX_VALUE;
+                    for(GameState child : nextStates)
+                    v = Math.max(v, alphabeta(child, depth-1, "B", deadline));
+                    alpha = Math.max(alpha,v);
+                    if(beta <= alpha){
+                        return v; //betaprune
+                    }
+        
+                }else{//player=B
+                    v= Integer.MAX_VALUE;
+                    for(GameState child : nextStates){
+                        v=Math.min(v,alphabeta(child,depth-1, "A", deadline));
+                        beta = Math.min(beta,v);
+                    }
+                    if (beta <= alpha){
+                        return v;
+                    }
+                }//alphaprune
+        }
         return v;
     }
 
