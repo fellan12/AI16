@@ -15,16 +15,16 @@ public class Player {
         Vector<GameState> nextStates = new Vector<GameState>();
         gameState.findPossibleMoves(nextStates);
 
-        if (nextStates.size() == 0) {
+        if (nextStates.isEmpty()) {
             // Must play "pass" move if there are no other moves possible.
             return new GameState(gameState, new Move());
         }
         int tmp;                        
-        GameState next = nextStates.get(0);          //Going to be the best move
-        int res = -Integer.MAX_VALUE;   //Going to be the value for the best move
+        GameState next = nextStates.get(0);        //Going to be the best move
+        int res = -Integer.MAX_VALUE;              //Going to be the value for the best move
 
         for(GameState state : nextStates){
-            tmp = alphabeta(Integer.MAX_VALUE, -Integer.MAX_VALUE, state, 5, "A", deadline);    //Run alpha-beta on a state
+            tmp = alphabeta(Integer.MAX_VALUE, -Integer.MAX_VALUE, state, 3, "A", deadline);    //Run alpha-beta on a state
             if(res < tmp){      //If the value is better then det prevous
                 res = tmp;      //Save the value
                 next = state;   //Save the state
@@ -54,8 +54,8 @@ public class Player {
                 }else if (player == "A"){
                     v = -Integer.MAX_VALUE;
                     for(GameState child : nextStates)
-                    v = Math.max(v, alphabeta(alpha, beta, child, depth-1, "B", deadline));
-                    alpha = Math.max(alpha,v);
+                        v = Math.max(v, alphabeta(alpha, beta, child, depth-1, "B", deadline));
+                        alpha = Math.max(alpha,v);
                     if(beta <= alpha){
                         return v; //betaprune
                     }
@@ -63,13 +63,13 @@ public class Player {
                 }else{//player=B
                     v= Integer.MAX_VALUE;
                     for(GameState child : nextStates){
-                        v=Math.min(v,alphabeta(alpha, beta, child,depth-1, "A", deadline));
+                        v=Math.min(v,alphabeta(alpha, beta, child, depth-1, "A", deadline));
                         beta = Math.min(beta,v);
                     }
                     if (beta <= alpha){
-                        return v;
+                        return v; //alphaprune
                     }
-                }//alphaprune
+                }
         
         return v;
     }
@@ -93,6 +93,7 @@ public class Player {
             }
         }
 
+        //Diagonals
         for(int i = 0; i < 4; i++) {
             if(state.at(i,i) == 1) {
                 sum++;
