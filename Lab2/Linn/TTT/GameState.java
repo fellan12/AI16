@@ -14,7 +14,6 @@ import java.util.Vector;
  *  3  | 12  13 14 15 |  3
  *      ---------------
  *        0  1  2  3
- 
  *
  * The staring board looks like this:
  *
