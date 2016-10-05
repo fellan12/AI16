@@ -20,43 +20,40 @@ public class Player {
             return new GameState(gameState, new Move());
         }
         int tmp;                        
-        GameState next = nextStates.get(0);        //Going to be the best move
-        int res = -Integer.MAX_VALUE;              //Going to be the value for the best move
+        GameState next = nextStates.firstElement();        //Going to be the best move
+        int res = -Integer.MAX_VALUE;                      //Going to be the value for the best move
 
         for(GameState state : nextStates){
-            tmp = alphabeta(Integer.MAX_VALUE, -Integer.MAX_VALUE, state, 20, "A");    //Run alpha-beta on a state
+            tmp = alphabeta(Integer.MAX_VALUE, -Integer.MAX_VALUE, state, 20, Constants.CELL_X);    //Run alpha-beta on a state
             if(res < tmp){      //If the value is better then det prevous
                 res = tmp;      //Save the value
                 next = state;   //Save the state
             }
         }
-        
         return next;            //Return the state
     }
 
-    public static int alphabeta(int alpha, int beta, GameState currState, int depth, String player){
+    public static int alphabeta(int alpha, int beta, GameState currState, int depth, int player){
         //state: the current state we are analyzing
         //alpha: the current best value achievable by A
         //beta: the current best value acheivable by B
         //player: the current player
         //returns the minimax value of the state
-        int v = 0;1
-
-        Vector<GameState> nextStates = new Vector<GameState>();
-                
-        currState.findPossibleMoves(nextStates);
-
-
-        if (depth == 0 || nextStates.isEmpty()) {
+        if(currState.isEOG()){
+            return gamma(currState, player);
+        }
+        else if (depth == 0) {
             //terminalstate
-            v = utility_function(currState, player);
+            return eval(currState);
         }
 
-
-        else if (player == "X"){
+        int v = 0;
+        Vector<GameState> nextStates = new Vector<GameState>();
+        currState.findPossibleMoves(nextStates);
+        if (!nextStates.isEmpty() && player == Constants.CELL_X){
             v = -Integer.MAX_VALUE;
             for(GameState child : nextStates){
-                v = Math.max(v, alphabeta(alpha, beta, child, depth-1, "O"));
+                v = Math.max(v, alphabeta(alpha, beta, child, depth-1, Constants.CELL_O));
                 alpha = Math.max(alpha,v);
             
                 if(beta <= alpha){
@@ -64,10 +61,10 @@ public class Player {
                 }
             }
         }
-        else if (player == "O"){ 
+        else if (!nextStates.isEmpty() && player == Constants.CELL_O){ 
             v = Integer.MAX_VALUE;
             for(GameState child : nextStates){
-                v=Math.min(v,alphabeta(alpha, beta, child,depth-1, "X"));
+                v=Math.min(v,alphabeta(alpha, beta, child,depth-1, Constants.CELL_X));
                 beta = Math.min(beta,v);
 
                 if (beta <= alpha){
@@ -75,57 +72,52 @@ public class Player {
                 }
             }
         }//alphaprune
-        
         return v;
     }
 
-    public static int utility_function(GameState state, String player){
+    public static int gamma(GameState state, int player){
         int sum = 0;
-
-        if (state.isEOG() ) {
-            // check who won
-            if (state.isXWin()) {
+        if (player == Constants.CELL_O) {
+            if (state.isOWin()) {
                 sum = Integer.MAX_VALUE;
-            }
-            else if(state.isOWin()) {
+            } else if (state.isXWin()) {
                 sum = -Integer.MAX_VALUE;
             }
-        }
-
-        //Diagonals
-        for(int i = 0; i < 4; i++) {
-            if(state.at(i,i) == 1) {
-                sum++;
-            else {
-        
-            int x = (player == "X" ? Constants.CELL_X : Constants.CELL_O);
-
-            //Colons
-            for(int i = 0; i < GameState.BOARD_SIZE; i++)
-                for(int j = 0; j < GameState.BOARD_SIZE; j++) {
-                    if(state.at(j,i) == x) {
-                        sum++;
-                    }
-                }
-
-            //Rows
-            for(int i = 0; i < GameState.BOARD_SIZE; i = i+4) {
-                for(int j = 0; j < GameState.BOARD_SIZE; j++) {
-                    if(state.at(i,j) == x) {
-                        sum++;
-                    }
-                }
+        } else if (player == Constants.CELL_X) {
+            if (state.isXWin()) {
+                sum = Integer.MAX_VALUE;
+            } else if (state.isOWin()) {
+                sum = -Integer.MAX_VALUE;
             }
-
-            for(int i = 0; i < GameState.BOARD_SIZE; i++) {
-                if(state.at(i,i) == x) {
-                    sum++;
-                }
-                if(state.at(i, GameState.BOARD_SIZE-(i+1)) == x){
-                    sum++;
-                }
-            }
+       
+        }else{
+                sum = 0;       //Tie
         }
         return sum;
-    }  
+    }
+
+    public static int eval(GameState state){
+        int sum = 0;
+        for(int i = 0; i < 4; i++){
+            for(int j = 0; j < 4; j++){
+                //Colon
+                if(state.at(j,i) == Constants.CELL_X){
+                    sum++;
+                }
+                //Row
+                if(state.at(i, j) == Constants.CELL_X){
+                    sum++;
+                }
+            }
+
+            //Diagonals
+            if(state.at(i,i) == 1){
+                sum++;
+            }
+            if(state.at(12-4*i, 12-5*i) == Constants.CELL_X){
+                sum++;
+            }
+        }
+       return sum;
+    }
 }
