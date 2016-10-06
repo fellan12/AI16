@@ -26,7 +26,7 @@ public class Player {
         int depth = 5;
 
         for(GameState state : nextStates){
-            int tmp = alphabeta(state, Integer.MIN_VALUE, Integer.MAX_VALUE, depth, Constants.CELL_O);    //Start alphabeta with the next person (O), because you (X) starts
+            int tmp = alphabeta(state, Integer.MIN_VALUE, Integer.MAX_VALUE, depth, gameState.getNextPerson());    //Start alphabeta with the next person (O), because you (X) starts
             if(res < tmp){      //If the value is better then det prevous
                 res = tmp;      //Save the value
                 next = state;   //Save the state
