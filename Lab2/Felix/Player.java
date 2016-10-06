@@ -12,6 +12,7 @@ public class Player {
      * @return the next state the board is in after our move
      */
     public GameState play(final GameState gameState, final Deadline deadline) {
+       
         Vector<GameState> nextStates = new Vector<GameState>();
         gameState.findPossibleMoves(nextStates);
 
@@ -19,21 +20,23 @@ public class Player {
             // Must play "pass" move if there are no other moves possible.
             return new GameState(gameState, new Move());
         }
-        int tmp;                        
+
         GameState next = nextStates.firstElement();        //Going to be the best move
-        int res = -Integer.MAX_VALUE;                      //Going to be the value for the best move
+        int res = Integer.MIN_VALUE;                      //Going to be the value for the best move
+        int depth = 5;
 
         for(GameState state : nextStates){
-            tmp = alphabeta(Integer.MAX_VALUE, -Integer.MAX_VALUE, state, 20, Constants.CELL_X);    //Run alpha-beta on a state
+            int tmp = alphabeta(state, Integer.MIN_VALUE, Integer.MAX_VALUE, depth, Constants.CELL_O);    //Start alphabeta with the next person (O), because you (X) starts
             if(res < tmp){      //If the value is better then det prevous
                 res = tmp;      //Save the value
                 next = state;   //Save the state
             }
         }
         return next;            //Return the state
+        
     }
 
-    public static int alphabeta(int alpha, int beta, GameState currState, int depth, int player){
+    private int alphabeta(GameState currState, int alpha, int beta, int depth, int player){
         //state: the current state we are analyzing
         //alpha: the current best value achievable by A
         //beta: the current best value acheivable by B
@@ -51,9 +54,9 @@ public class Player {
         Vector<GameState> nextStates = new Vector<GameState>();
         currState.findPossibleMoves(nextStates);
         if (!nextStates.isEmpty() && player == Constants.CELL_X){
-            v = -Integer.MAX_VALUE;
+            v = Integer.MIN_VALUE;
             for(GameState child : nextStates){
-                v = Math.max(v, alphabeta(alpha, beta, child, depth-1, Constants.CELL_O));
+                v = Math.max(v, alphabeta(child, alpha, beta, depth-1, Constants.CELL_O));
                 alpha = Math.max(alpha,v);
             
                 if(beta <= alpha){
@@ -64,7 +67,7 @@ public class Player {
         else if (!nextStates.isEmpty() && player == Constants.CELL_O){ 
             v = Integer.MAX_VALUE;
             for(GameState child : nextStates){
-                v=Math.min(v,alphabeta(alpha, beta, child,depth-1, Constants.CELL_X));
+                v=Math.min(v,alphabeta(child, alpha, beta, depth-1, Constants.CELL_X));
                 beta = Math.min(beta,v);
 
                 if (beta <= alpha){
@@ -75,19 +78,19 @@ public class Player {
         return v;
     }
 
-    public static int gamma(GameState state, int player){
+    private int gamma(GameState state, int player){
         int sum = 0;
         if (player == Constants.CELL_O) {
             if (state.isOWin()) {
                 sum = Integer.MAX_VALUE;
             } else if (state.isXWin()) {
-                sum = -Integer.MAX_VALUE;
+                sum = Integer.MIN_VALUE;
             }
         } else if (player == Constants.CELL_X) {
             if (state.isXWin()) {
                 sum = Integer.MAX_VALUE;
             } else if (state.isOWin()) {
-                sum = -Integer.MAX_VALUE;
+                sum = Integer.MIN_VALUE;
             }
        
         }else{
@@ -96,7 +99,7 @@ public class Player {
         return sum;
     }
 
-    public static int eval(GameState state){
+    private int eval(GameState state){
         int sum = 0;
         for(int i = 0; i < 4; i++){
             for(int j = 0; j < 4; j++){
